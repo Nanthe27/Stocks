@@ -275,7 +275,6 @@ const Store = {
     };
     const resp = await fetch(scriptUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
