@@ -1,26 +1,77 @@
-# StockFlow v1.0.0
-### Production-grade Inventory Management System
+# StockFlow
+### Free Inventory Management System
+
+A lightweight, client-side inventory management system. No server required. Works entirely in your browser. Data is stored locally and optionally synced to Google Sheets.
 
 ---
 
-## Quick Start
+## Live Demo
 
+> Deploy your own copy for free using GitHub Pages — no backend, no hosting costs, no setup fees.
+
+---
+
+## Features
+
+- Stock management (add, edit, delete items)
+- Income & expense transaction tracking
+- Dashboard with analytics and charts
+- Role-based access (Owner, Admin, Sale, Customer)
+- USD ↔ KHR currency calculator
+- Optional Google Sheets cloud sync
+- Dark / light theme
+- Works offline — data stored in your browser
+
+---
+
+## How to Use
+
+### Option 1 — Online (GitHub Pages, Recommended)
+
+1. [Fork this repository](https://github.com/) or download and upload files to a new repo
+2. In your repo: **Settings → Pages → Source: main branch → / (root)**
+3. Visit `https://YOUR_USERNAME.github.io/REPO_NAME/`
+4. Log in with your credentials and start using
+
+No installation. No server. Works on any device with a browser.
+
+---
+
+### Option 2 — Offline (Local)
+
+You cannot open `index.html` directly as a file — browsers block JavaScript modules on `file://`. Use a local server instead:
+
+**Python** (if installed):
 ```bash
-# Serve locally (any method works):
-python3 -m http.server 8080
-# or
-npx serve .
-# or open index.html directly in Chrome/Firefox
+cd path/to/stockflow
+python -m http.server 8080
+```
+Then open `http://localhost:8080`
+
+**Node.js** (if installed):
+```bash
+npx serve path/to/stockflow
 ```
 
-Then visit `http://localhost:8080`
+**VS Code**: Install the **Live Server** extension → right-click `index.html` → Open with Live Server
 
-**Default credentials:**
-| Field | Value |
-|---|---|
-| Username | `nan` |
-| Password | `admin@nan` |
-| Role | Owner (full access) |
+---
+
+## Google Sheets Sync (Optional)
+
+StockFlow works fully offline without this. If you want cloud backup:
+
+1. Go to [script.google.com](https://script.google.com) → New project
+2. Paste the full contents of `google-apps-script.js`
+3. Run the `autoSetup()` function once (creates sheet tabs and structure)
+4. Click **Deploy → New deployment → Web App**
+   - Execute as: **Me**
+   - Who has access: **Anyone**
+5. Copy the deployed Web App URL
+6. In StockFlow → **Settings** → paste the URL → **Save Settings**
+7. Click **Force Sync** to verify
+
+Your data will now sync to Google Sheets automatically on every change.
 
 ---
 
@@ -28,72 +79,32 @@ Then visit `http://localhost:8080`
 
 ```
 stockflow/
-├── index.html                  # Main SPA shell + all page HTML
+├── index.html              # Main app
+├── disclaimer.html         # Terms of use
 ├── css/
-│   └── app.css                 # Full design system + components
+│   └── app.css             # Styles
 ├── js/
-│   ├── app.js                  # Main app logic, pages, router
-│   ├── store.js                # In-memory store + Google Sheets sync
-│   └── locale.js               # i18n strings (English v1.0.0)
-├── google-apps-script.js       # Copy → paste into Google Apps Script editor
-└── README.md
+│   ├── app.js              # App logic
+│   ├── store.js            # Data store + sync
+│   └── locale.js           # Language strings
+└── google-apps-script.js   # Paste into Google Apps Script
 ```
-
----
-
-## Google Sheets Setup (optional — for cloud persistence)
-
-1. Go to [script.google.com](https://script.google.com) → New project
-2. Paste the contents of `google-apps-script.js`
-3. Run the `autoSetup()` function once (to create sheet tabs + seed data)
-4. Deploy → **New deployment** → Web App
-   - Execute as: **Me**
-   - Who has access: **Anyone**
-5. Copy the deployed Web App URL
-6. In StockFlow → Settings → paste the URL → Save Settings
-7. Click **Force Sync** to verify connection
-
----
-
-## GitHub Pages Deployment
-
-```bash
-git init
-git add .
-git commit -m "StockFlow v1.0.0"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/stockflow.git
-git push -u origin main
-```
-
-Then in the repo: **Settings → Pages → Source: main branch → / (root)**
-
-No API keys or secrets are stored in the repository. The Apps Script URL is stored in localStorage only.
 
 ---
 
 ## Roles & Permissions
 
-| Permission | Owner | Admin | Sale | Customer |
-|---|---|---|---|---|
-| View Dashboard | Yes | Yes | Yes | No |
-| Manage Stock | Yes | Yes | Yes | No |
-| Manage Users | Yes | Yes | No | No |
-| View Reports | Yes | Yes | Yes | No |
-| Edit Records | Yes | Yes | Yes | No |
-| Delete Records | Yes | Yes | No | No |
-| Access Settings | Yes | No | No | No |
+| Permission       | Owner | Admin | Sale | Customer |
+|-----------------|-------|-------|------|----------|
+| View Dashboard  | Yes   | Yes   | Yes  | No       |
+| Manage Stock    | Yes   | Yes   | Yes  | No       |
+| Manage Users    | Yes   | Yes   | No   | No       |
+| View Reports    | Yes   | Yes   | Yes  | No       |
+| Edit Records    | Yes   | Yes   | Yes  | No       |
+| Delete Records  | Yes   | Yes   | No   | No       |
+| Access Settings | Yes   | No    | No   | No       |
 
-Role permissions are configurable by the Owner via Settings → Role Permission Matrix.
-
----
-
-## Architecture Notes
-
-- **In-memory first:** All reads/writes hit in-memory store instantly. localStorage provides offline persistence. Google Sheets sync runs in the background (non-blocking).
-- **i18n-ready:** All UI strings are defined in `js/locale.js` under the `LOCALES` object. To add a language, add a new key and call `setLocale('langCode')`.
-- **Modular:** Each page is a self-contained object in `Pages`. Add new pages by adding a new `Pages.pageName` entry and a `<main id="page-pageName">` in `index.html`.
-- **No build step required.** Pure ES modules served as static files.
+Role permissions are fully configurable by the Owner via **Settings → Role Permission Matrix**.
 
 ---
 
@@ -101,8 +112,26 @@ Role permissions are configurable by the Owner via Settings → Role Permission 
 
 - Primary: **USD**
 - Built-in USD ↔ KHR calculator (default rate: 1 USD = 4,100 KHR)
-- Exchange rate configurable in Settings
+- Exchange rate is configurable in Settings
 
 ---
 
-*StockFlow v1.0.0 — MIT License*
+## Disclaimer
+
+This project is free to use, as-is.
+
+- Tested with small amounts of data. Bugs may occur.
+- **Use at your own risk.** You are responsible for how you use this system.
+- **No guaranteed support.** Feedback is welcome but fixes are not promised.
+- The creator takes **no responsibility** for any data loss or issues arising from use.
+- By using this system, you agree to these terms.
+
+For feedback: [t.me/nann27](https://t.me/nann27)
+
+---
+
+## License
+
+Free to use. No attribution required.
+
+*StockFlow v1.0.0*
