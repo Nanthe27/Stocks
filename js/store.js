@@ -31,22 +31,9 @@ const DEFAULT_SETTINGS = {
   lastSync: null,
 };
 
-const DEFAULT_STOCK = [
-  { id: 's1', name: 'Laptop Pro 15"', sku: 'LPT-001', category: 'Electronics', quantity: 24, costPrice: 850, salePrice: 1199, supplier: 'TechDist Co.', description: 'High-performance laptop', status: 'in_stock', createdAt: new Date().toISOString() },
-  { id: 's2', name: 'Wireless Mouse', sku: 'WMS-002', category: 'Accessories', quantity: 5, costPrice: 12, salePrice: 29, supplier: 'GadgetWholesale', description: 'Ergonomic wireless mouse', status: 'low_stock', createdAt: new Date().toISOString() },
-  { id: 's3', name: 'USB-C Hub 7-Port', sku: 'HUB-003', category: 'Accessories', quantity: 0, costPrice: 18, salePrice: 45, supplier: 'GadgetWholesale', description: '7-port USB-C hub', status: 'out_of_stock', createdAt: new Date().toISOString() },
-  { id: 's4', name: 'Mechanical Keyboard', sku: 'KBD-004', category: 'Accessories', quantity: 31, costPrice: 65, salePrice: 129, supplier: 'TypeMaster Inc.', description: 'Tactile mechanical keyboard', status: 'in_stock', createdAt: new Date().toISOString() },
-  { id: 's5', name: '4K Monitor 27"', sku: 'MON-005', category: 'Electronics', quantity: 8, costPrice: 280, salePrice: 499, supplier: 'DisplayTech', description: '27-inch 4K IPS monitor', status: 'in_stock', createdAt: new Date().toISOString() },
-  { id: 's6', name: 'Desk Lamp LED', sku: 'LMP-006', category: 'Furniture', quantity: 3, costPrice: 22, salePrice: 55, supplier: 'OfficeSupplies Ltd.', description: 'Adjustable LED desk lamp', status: 'low_stock', createdAt: new Date().toISOString() },
-];
+const DEFAULT_STOCK = [];
 
-const DEFAULT_TRANSACTIONS = [
-  { id: 't1', type: 'income', amount: 2398, description: 'Sale: 2x Laptop Pro', userId: 'u1', date: new Date(Date.now() - 2*86400000).toISOString() },
-  { id: 't2', type: 'expense', amount: 1700, description: 'Restock: Laptops', userId: 'u1', date: new Date(Date.now() - 5*86400000).toISOString() },
-  { id: 't3', type: 'income', amount: 129, description: 'Sale: Mechanical Keyboard', userId: 'u1', date: new Date(Date.now() - 1*86400000).toISOString() },
-  { id: 't4', type: 'income', amount: 498, description: 'Sale: 2x Wireless Mouse + Hub', userId: 'u1', date: new Date(Date.now() - 3*86400000).toISOString() },
-  { id: 't5', type: 'expense', amount: 420, description: 'Restock: Accessories', userId: 'u1', date: new Date(Date.now() - 8*86400000).toISOString() },
-];
+const DEFAULT_TRANSACTIONS = [];
 
 // ── Store ────────────────────────────────────────────────────────────────────
 const Store = {
