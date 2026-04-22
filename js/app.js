@@ -103,25 +103,17 @@ function closeModal(id) {
     el.classList.remove('open', 'closing');
   }, 240);
 }
+function openDisclaimer() { openModal('disclaimer-modal'); }
 
 // ── Router ────────────────────────────────────────────────────────────────────
 const Router = {
   current: 'dashboard',
   navigate(page) {
     this.current = page;
-    document.querySelectorAll('.page').forEach(p => {
-      p.classList.remove('active');
-    });
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     const pageEl = document.getElementById('page-' + page);
-    if (pageEl) {
-      // Force reflow so animation replays on every navigate
-      pageEl.style.animation = 'none';
-      pageEl.classList.add('active');
-      requestAnimationFrame(() => {
-        pageEl.style.animation = '';
-      });
-    }
+    if (pageEl) pageEl.classList.add('active');
     const navEl = document.querySelector(`[data-page="${page}"]`);
     if (navEl) navEl.classList.add('active');
     document.getElementById('topbar-title').textContent = t(page);
@@ -906,6 +898,7 @@ function initStoreListeners() {
 window.Pages = Pages;
 window.Calc = Calc;
 window.closeModal = closeModal;
+window.openDisclaimer = openDisclaimer;
 
 document.addEventListener('DOMContentLoaded', init);
 
