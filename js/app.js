@@ -78,25 +78,50 @@ function toast(msg, type = 'info', duration = 3500) {
 function confirm(msg, onYes) {
   const ov = document.getElementById('confirm-overlay');
   document.getElementById('confirm-msg').textContent = msg;
+  ov.classList.remove('closing');
   ov.classList.add('open');
-  const cleanup = () => ov.classList.remove('open');
+  const cleanup = () => {
+    ov.classList.add('closing');
+    setTimeout(() => ov.classList.remove('open', 'closing'), 240);
+  };
   document.getElementById('confirm-yes').onclick = () => { cleanup(); onYes(); };
   document.getElementById('confirm-no').onclick = cleanup;
 }
 
 // ── Modal helpers ──────────────────────────────────────────────────────────────
-function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function openModal(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.remove('closing');
+  el.classList.add('open');
+}
+function closeModal(id) {
+  const el = document.getElementById(id);
+  if (!el || !el.classList.contains('open')) return;
+  el.classList.add('closing');
+  setTimeout(() => {
+    el.classList.remove('open', 'closing');
+  }, 240);
+}
 
 // ── Router ────────────────────────────────────────────────────────────────────
 const Router = {
   current: 'dashboard',
   navigate(page) {
     this.current = page;
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => {
+      p.classList.remove('active');
+    });
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     const pageEl = document.getElementById('page-' + page);
-    if (pageEl) pageEl.classList.add('active');
+    if (pageEl) {
+      // Force reflow so animation replays on every navigate
+      pageEl.style.animation = 'none';
+      pageEl.classList.add('active');
+      requestAnimationFrame(() => {
+        pageEl.style.animation = '';
+      });
+    }
     const navEl = document.querySelector(`[data-page="${page}"]`);
     if (navEl) navEl.classList.add('active');
     document.getElementById('topbar-title').textContent = t(page);
@@ -142,8 +167,18 @@ function initAuth() {
 }
 
 function bootApp() {
-  document.getElementById('auth-screen').classList.add('hidden');
-  document.getElementById('app').classList.add('visible');
+  const auth = document.getElementById('auth-screen');
+  auth.style.opacity = '0';
+  auth.style.pointerEvents = 'none';
+  setTimeout(() => auth.classList.add('hidden'), 420);
+  const app = document.getElementById('app');
+  app.classList.add('visible');
+  app.style.opacity = '0';
+  requestAnimationFrame(() => {
+    app.style.transition = 'opacity 0.38s ease';
+    app.style.opacity = '1';
+    setTimeout(() => { app.style.transition = ''; app.style.opacity = ''; }, 400);
+  });
   updateUserDisplay();
   applyTheme(Store.settings.theme || 'dark');
   Router.navigate('dashboard');
@@ -750,7 +785,11 @@ const Calc = {
   justCalc: false,
 
   open() { document.getElementById('calc-overlay').classList.add('open'); this.updateDisplay(); },
-  close() { document.getElementById('calc-overlay').classList.remove('open'); },
+  close() {
+    const ov = document.getElementById('calc-overlay');
+    ov.classList.add('closing');
+    setTimeout(() => ov.classList.remove('open', 'closing'), 240);
+  },
 
   press(val) {
     if (val === 'C') { this.display = '0'; this.expression = ''; this.justCalc = false; }
@@ -869,3 +908,23 @@ window.Calc = Calc;
 window.closeModal = closeModal;
 
 document.addEventListener('DOMContentLoaded', init);
+
+// ── Ripple effect on all .btn clicks ─────────────────────────────────────────
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.btn');
+  if (!btn || btn.disabled) return;
+  const wave = document.createElement('span');
+  wave.className = 'ripple-wave';
+  const rect = btn.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height);
+  wave.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - rect.left - size / 2}px;top:${e.clientY - rect.top - size / 2}px`;
+  btn.appendChild(wave);
+  wave.addEventListener('animationend', () => wave.remove(), { once: true });
+});
+
+// ── Close modal on backdrop click ─────────────────────────────────────────────
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('modal-overlay') && e.target.classList.contains('open')) {
+    closeModal(e.target.id);
+  }
+});
