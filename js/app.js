@@ -220,6 +220,7 @@ Pages.dashboard = {
   },
 
   renderCharts(data) {
+    if (typeof Chart === 'undefined') return; // Chart.js not loaded yet
     // Bar chart — last 6 months income vs expense
     const months = [];
     const incomeData = [];
@@ -850,7 +851,7 @@ function init() {
 
   // Try restore session
   if (Store.restoreSession()) {
-    bootApp();
+    try { bootApp(); } catch(e) { console.error('bootApp error:', e); }
   } else {
     document.getElementById('auth-screen').style.opacity = '1';
   }
