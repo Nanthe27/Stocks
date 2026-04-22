@@ -273,12 +273,13 @@ const Store = {
       transactions: this.transactions,
       rolesPermissions: this.rolesPermissions,
     };
-    const resp = await fetch(scriptUrl, {
+    // GAS Web App does a 302 redirect on POST which breaks CORS preflight.
+    // no-cors bypasses preflight — response is opaque but data IS received by GAS.
+    await fetch(scriptUrl, {
       method: 'POST',
+      mode: 'no-cors',
       body: JSON.stringify(payload),
     });
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    return resp.json();
   },
 
   async forceSync() {
