@@ -25,7 +25,7 @@ const DEFAULT_ROLES_PERMISSIONS = {
 };
 
 const DEFAULT_SETTINGS = {
-  scriptUrl: '',
+  scriptUrl: 'https://script.google.com/macros/s/AKfycbwyaklphNVT4V8umYwlAV13LyEWsFH2dDay6RpTvE2sLzL2dM2kkRmDJ2-iVNg3B8gd/exec',
   exchangeRate: 4100,
   theme: 'dark',
   lastSync: null,
