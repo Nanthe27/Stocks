@@ -339,6 +339,7 @@ Pages.stock = {
   page: 1,
   perPage: 10,
   editingId: null,
+  sellingId: null,
 
   render() {
     this.renderTable();
@@ -387,6 +388,7 @@ Pages.stock = {
           <td>${statusBadge}</td>
           <td>
             <div class="flex gap-2">
+              ${canEdit ? `<button class="btn-icon" style="color:var(--accent-green)" onclick="Pages.stock.openSell('${s.id}')" title="Record Sale"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>` : ''}
               ${canEdit ? `<button class="btn-icon" onclick="Pages.stock.openEdit('${s.id}')" title="${t('edit')}">${icons.edit}</button>` : ''}
               ${canDelete ? `<button class="btn-icon" style="color:var(--accent-red)" onclick="Pages.stock.confirmDelete('${s.id}')" title="${t('delete')}">${icons.trash}</button>` : ''}
             </div>
@@ -466,6 +468,50 @@ Pages.stock = {
       this.renderTable();
       Pages.dashboard.render && Pages.dashboard.render();
     });
+  },
+
+  openSell(id) {
+    const item = Store.getStock().find(s => s.id === id);
+    if (!item) return;
+    this.sellingId = id;
+    document.getElementById('sell-item-name').textContent = item.name;
+    document.getElementById('sell-item-sku').textContent = item.sku;
+    document.getElementById('sell-item-stock').textContent = fmtNum(item.quantity);
+    document.getElementById('sell-qty').value = 1;
+    document.getElementById('sell-price').value = item.salePrice;
+    document.getElementById('sell-note').value = '';
+    document.getElementById('sell-total-display').textContent = fmt(item.salePrice);
+    openModal('sell-modal');
+  },
+
+  updateSellTotal() {
+    const qty = parseFloat(document.getElementById('sell-qty').value) || 0;
+    const price = parseFloat(document.getElementById('sell-price').value) || 0;
+    document.getElementById('sell-total-display').textContent = fmt(qty * price);
+  },
+
+  recordSale() {
+    const id = this.sellingId;
+    const item = Store.getStock().find(s => s.id === id);
+    if (!item) return;
+    const qty = parseInt(document.getElementById('sell-qty').value) || 0;
+    const price = parseFloat(document.getElementById('sell-price').value) || 0;
+    const note = document.getElementById('sell-note').value.trim();
+    if (qty <= 0) { toast('Quantity must be at least 1.', 'error'); return; }
+    if (qty > item.quantity) { toast('Not enough stock. Available: ' + fmtNum(item.quantity), 'error'); return; }
+    if (price <= 0) { toast('Sale price must be greater than 0.', 'error'); return; }
+    const total = qty * price;
+    Store.updateStockItem(id, { quantity: item.quantity - qty });
+    Store.addTransaction({
+      type: 'income',
+      amount: total,
+      description: `Sale: ${qty}x ${item.name}${note ? ' — ' + note : ''}`,
+      userId: Store.currentUser.id,
+    });
+    closeModal('sell-modal');
+    toast(`Sold ${qty}x ${item.name} for ${fmt(total)}`, 'success');
+    this.renderTable();
+    Pages.dashboard.render && Pages.dashboard.render();
   },
 };
 
