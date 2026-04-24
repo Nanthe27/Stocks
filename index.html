@@ -2,7 +2,7 @@
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
   <title>StockFlow — Inventory Management</title>
   <meta name="description" content="StockFlow v1.0.0 — Production-grade inventory management system"/>
 
@@ -25,7 +25,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 
-  <link rel="stylesheet" href="css/app.css?v=9"/>
+  <link rel="stylesheet" href="css/app.css?v=11"/>
 </head>
 <body>
 
@@ -44,7 +44,7 @@
     <form id="login-form" autocomplete="off">
       <div class="form-group">
         <label class="form-label" for="login-username">Username</label>
-        <input id="login-username" name="username" class="form-input" type="text" placeholder="Enter username" autocomplete="username" required/>
+        <input id="login-username" name="username" class="form-input" type="text" placeholder="Enter username" autocomplete="username" autocorrect="off" autocapitalize="none" autocomplete="off" spellcheck="false" inputmode="text" required/>
       </div>
       <div class="form-group">
         <label class="form-label" for="login-password">Password</label>
@@ -52,7 +52,7 @@
       </div>
       <button type="submit" class="btn btn-primary btn-full btn-lg" style="margin-top:8px">Sign In</button>
     </form>
-    <p style="text-align:center;margin-top:24px;font-size:.72rem;color:var(--text-muted)">StockFlow v1.1.4 &mdash; <a href="#" onclick="openDisclaimer();return false;" style="color:var(--text-muted);text-decoration:underline;text-underline-offset:3px">Disclaimer</a></p>
+    <p style="text-align:center;margin-top:24px;font-size:.72rem;color:var(--text-muted)">StockFlow v1.1.6 &mdash; <a href="#" onclick="openDisclaimer();return false;" style="color:var(--text-muted);text-decoration:underline;text-underline-offset:3px">Disclaimer</a></p>
   </div>
 </div>
 
@@ -65,7 +65,7 @@
       <span class="app-logo-img" style="display:inline-flex;width:36px;height:36px"></span>
       <div class="sidebar-logo-text">
         StockFlow
-        <small>v1.1.4</small>
+        <small>v1.1.6</small>
       </div>
     </div>
 
@@ -800,7 +800,7 @@
   </button>
 </nav>
 
-<script type="module" src="js/app.js?v=9"></script>
+<script type="module" src="js/app.js?v=11"></script>
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
