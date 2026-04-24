@@ -25,7 +25,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 
-  <link rel="stylesheet" href="css/app.css?v=6"/>
+  <link rel="stylesheet" href="css/app.css?v=7"/>
 </head>
 <body>
 
@@ -52,7 +52,7 @@
       </div>
       <button type="submit" class="btn btn-primary btn-full btn-lg" style="margin-top:8px">Sign In</button>
     </form>
-    <p style="text-align:center;margin-top:24px;font-size:.72rem;color:var(--text-muted)">StockFlow v1.1.1 &mdash; <a href="#" onclick="openDisclaimer();return false;" style="color:var(--text-muted);text-decoration:underline;text-underline-offset:3px">Disclaimer</a></p>
+    <p style="text-align:center;margin-top:24px;font-size:.72rem;color:var(--text-muted)">StockFlow v1.1.2 &mdash; <a href="#" onclick="openDisclaimer();return false;" style="color:var(--text-muted);text-decoration:underline;text-underline-offset:3px">Disclaimer</a></p>
   </div>
 </div>
 
@@ -65,7 +65,7 @@
       <span class="app-logo-img" style="display:inline-flex;width:36px;height:36px"></span>
       <div class="sidebar-logo-text">
         StockFlow
-        <small>v1.1.1</small>
+        <small>v1.1.2</small>
       </div>
     </div>
 
@@ -128,7 +128,10 @@
     <header id="topbar">
       <div class="topbar-title" id="topbar-title">Dashboard</div>
       <div class="topbar-actions">
-        <button id="btn-theme" class="btn-icon" title="Toggle theme" id="theme-icon">
+        <button id="btn-sync" class="btn-icon" title="Sync to Google Sheets" onclick="Pages.settings && Pages.settings.forceSync ? Pages.settings.forceSync() : Store.forceSync().then(r=>toast(r.success?'Synced.':'Sync failed: '+r.message, r.success?'success':'error'))">
+          <svg id="sync-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        </button>
+        <button id="btn-theme" class="btn-icon" title="Toggle theme">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
         </button>
       </div>
@@ -796,7 +799,7 @@
   </button>
 </nav>
 
-<script type="module" src="js/app.js?v=6"></script>
+<script type="module" src="js/app.js?v=7"></script>
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
