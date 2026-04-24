@@ -1,4 +1,4 @@
-// StockFlow — Main App v1.0.0
+// StockFlow — Main App v1.0.1
 import { t } from './locale.js?v=2';
 import Store, { DEFAULT_ROLES_PERMISSIONS } from './store.js?v=2';
 
@@ -709,6 +709,89 @@ Pages.reports = {
         }
       }
     });
+  },
+};
+
+// ── Sales Page ────────────────────────────────────────────────────────────────
+Pages.sales = {
+  page: 1,
+  perPage: 15,
+
+  render() {
+    this.renderSummary();
+    this.renderTable();
+  },
+
+  getSales() {
+    const q = (document.getElementById('sales-search')?.value || '').toLowerCase();
+    return Store.getTransactions()
+      .filter(tx => tx.type === 'income')
+      .filter(tx => !q || tx.description.toLowerCase().includes(q))
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+  },
+
+  renderSummary() {
+    const txs = Store.getTransactions().filter(t => t.type === 'income');
+    const total = txs.reduce((s, t) => s + t.amount, 0);
+    const today = new Date().toDateString();
+    const todayTotal = txs.filter(t => new Date(t.date).toDateString() === today).reduce((s, t) => s + t.amount, 0);
+    const now = new Date();
+    const monthTotal = txs.filter(t => {
+      const d = new Date(t.date);
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    }).reduce((s, t) => s + t.amount, 0);
+
+    document.getElementById('sales-summary').innerHTML = `
+      <div><div style="font-size:.7rem;font-family:var(--font-heading);text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:4px">Today</div><div style="font-size:1.25rem;font-weight:700;font-family:var(--font-heading);color:var(--accent-green)">${fmt(todayTotal)}</div></div>
+      <div style="width:1px;background:var(--border)"></div>
+      <div><div style="font-size:.7rem;font-family:var(--font-heading);text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:4px">This Month</div><div style="font-size:1.25rem;font-weight:700;font-family:var(--font-heading);color:var(--accent-green)">${fmt(monthTotal)}</div></div>
+      <div style="width:1px;background:var(--border)"></div>
+      <div><div style="font-size:.7rem;font-family:var(--font-heading);text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:4px">All Time</div><div style="font-size:1.25rem;font-weight:700;font-family:var(--font-heading);color:var(--text-primary)">${fmt(total)}</div></div>
+      <div style="width:1px;background:var(--border)"></div>
+      <div><div style="font-size:.7rem;font-family:var(--font-heading);text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:4px">Transactions</div><div style="font-size:1.25rem;font-weight:700;font-family:var(--font-heading);color:var(--text-secondary)">${txs.length}</div></div>
+    `;
+  },
+
+  renderTable() {
+    const sales = this.getSales();
+    const start = (this.page - 1) * this.perPage;
+    const paged = sales.slice(start, start + this.perPage);
+    const users = Store.getUsers();
+    const getUser = id => { const u = users.find(u => u.id === id); return u ? (u.fullName || u.username) : id; };
+
+    const table = document.getElementById('sales-table');
+    if (!sales.length) {
+      table.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted)">No sales recorded yet.</td></tr>`;
+      document.getElementById('sales-pagination').innerHTML = '';
+      return;
+    }
+
+    table.innerHTML = `
+      <thead><tr>
+        <th>Date</th><th>Description</th><th>Sold By</th><th style="text-align:right">Amount</th>
+      </tr></thead>
+      <tbody>
+        ${paged.map(tx => {
+          const d = new Date(tx.date);
+          const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+          const timeStr = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+          return `<tr>
+            <td><div style="font-weight:600;font-size:.85rem">${dateStr}</div><div style="font-size:.75rem;color:var(--text-muted)">${timeStr}</div></td>
+            <td style="max-width:280px;white-space:normal">${tx.description}</td>
+            <td style="color:var(--text-secondary);font-size:.85rem">${getUser(tx.userId)}</td>
+            <td style="text-align:right;font-weight:700;font-family:var(--font-heading);color:var(--accent-green)">+${fmt(tx.amount)}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    `;
+
+    // Pagination
+    const pages = Math.ceil(sales.length / this.perPage);
+    document.getElementById('sales-pagination').innerHTML = pages <= 1 ? '' : `
+      <button class="btn btn-secondary btn-sm" ${this.page <= 1 ? 'disabled' : ''} onclick="Pages.sales.page--;Pages.sales.renderTable()">Prev</button>
+      <span style="font-size:.82rem;color:var(--text-muted);padding:0 8px">${this.page} / ${pages}</span>
+      <button class="btn btn-secondary btn-sm" ${this.page >= pages ? 'disabled' : ''} onclick="Pages.sales.page++;Pages.sales.renderTable()">Next</button>
+    `;
   },
 };
 
