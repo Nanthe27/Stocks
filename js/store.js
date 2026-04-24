@@ -1,7 +1,7 @@
 // StockFlow Data Store — v1.0.0
 // In-memory primary store with background Google Sheets sync
 
-import { t } from './locale.js?v=2';
+import { t } from './locale.js?v=3';
 
 // ── Default seed data ────────────────────────────────────────────────────────
 const DEFAULT_USERS = [
@@ -18,9 +18,10 @@ const DEFAULT_USERS = [
 ];
 
 const DEFAULT_ROLES_PERMISSIONS = {
-  owner:    { viewDashboard:true, manageStock:true, manageUsers:true, viewReports:true, editRecords:true, deleteRecords:true, accessSettings:true },
-  admin:    { viewDashboard:true, manageStock:true, manageUsers:true, viewReports:true, editRecords:true, deleteRecords:true, accessSettings:false },
-  sale:     { viewDashboard:true, manageStock:true, manageUsers:false, viewReports:true, editRecords:true, deleteRecords:false, accessSettings:false },
+  owner:    { viewDashboard:true,  manageStock:true,  manageUsers:true,  viewReports:true,  editRecords:true,  deleteRecords:true,  accessSettings:true  },
+  admin:    { viewDashboard:true,  manageStock:true,  manageUsers:true,  viewReports:true,  editRecords:true,  deleteRecords:true,  accessSettings:false },
+  sale:     { viewDashboard:true,  manageStock:true,  manageUsers:false, viewReports:true,  editRecords:true,  deleteRecords:false, accessSettings:false },
+  staff:    { viewDashboard:true,  manageStock:true,  manageUsers:false, viewReports:false, editRecords:true,  deleteRecords:false, accessSettings:false },
   customer: { viewDashboard:false, manageStock:false, manageUsers:false, viewReports:false, editRecords:false, deleteRecords:false, accessSettings:false },
 };
 
