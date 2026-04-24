@@ -25,7 +25,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 
-  <link rel="stylesheet" href="css/app.css?v=5"/>
+  <link rel="stylesheet" href="css/app.css?v=6"/>
 </head>
 <body>
 
@@ -52,7 +52,7 @@
       </div>
       <button type="submit" class="btn btn-primary btn-full btn-lg" style="margin-top:8px">Sign In</button>
     </form>
-    <p style="text-align:center;margin-top:24px;font-size:.72rem;color:var(--text-muted)">StockFlow v1.1.0 &mdash; <a href="#" onclick="openDisclaimer();return false;" style="color:var(--text-muted);text-decoration:underline;text-underline-offset:3px">Disclaimer</a></p>
+    <p style="text-align:center;margin-top:24px;font-size:.72rem;color:var(--text-muted)">StockFlow v1.1.1 &mdash; <a href="#" onclick="openDisclaimer();return false;" style="color:var(--text-muted);text-decoration:underline;text-underline-offset:3px">Disclaimer</a></p>
   </div>
 </div>
 
@@ -65,7 +65,7 @@
       <span class="app-logo-img" style="display:inline-flex;width:36px;height:36px"></span>
       <div class="sidebar-logo-text">
         StockFlow
-        <small>v1.1.0</small>
+        <small>v1.1.1</small>
       </div>
     </div>
 
@@ -550,9 +550,8 @@
         <button type="submit" class="btn btn-primary">Save User</button>
       </div>
     </form>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" onclick="closeModal('stock-modal')">Cancel</button>
-        <button type="submit" class="btn btn-primary">Save Item</button>
+  </div>
+</div>
       </div>
     </form>
   </div>
@@ -696,6 +695,16 @@
       </div>
       <div style="font-size:.72rem;color:var(--text-muted);margin-top:6px" id="rate-label">Rate: 1 USD = 4,100 KHR</div>
     </div>
+
+    <div style="margin-top:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span style="font-family:var(--font-heading);font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted)">History</span>
+        <button class="btn btn-ghost" style="font-size:.72rem;padding:3px 8px" onclick="Calc.clearHistory()">Clear</button>
+      </div>
+      <div id="calc-history" style="max-height:140px;overflow-y:auto;display:flex;flex-direction:column;gap:4px">
+        <div style="font-size:.78rem;color:var(--text-muted);text-align:center;padding:12px 0">No history yet</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -787,7 +796,7 @@
   </button>
 </nav>
 
-<script type="module" src="js/app.js?v=5"></script>
+<script type="module" src="js/app.js?v=6"></script>
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
