@@ -1,6 +1,6 @@
 // StockFlow — Main App v1.0.1
-import { t } from './locale.js?v=6';
-import Store, { DEFAULT_ROLES_PERMISSIONS } from './store.js?v=6';
+import { t } from './locale.js?v=7';
+import Store, { DEFAULT_ROLES_PERMISSIONS } from './store.js?v=7';
 
 // ── SVG Icons (Phosphor-style inline) ───────────────────────────────────────
 const icons = {
@@ -1111,6 +1111,30 @@ function initStoreListeners() {
   Store.on('stockChanged', () => { if (Router.current === 'stock') Pages.stock.renderTable(); });
   Store.on('usersChanged', () => { if (Router.current === 'users') Pages.users.renderTable(); });
   Store.on('storeChanged', () => { Router.navigate(Router.current); });
+  Store.on('syncStatus', (status) => {
+    const icon = document.getElementById('sync-icon');
+    const btn  = document.getElementById('btn-sync');
+    if (!icon || !btn) return;
+    if (status === 'syncing') {
+      icon.style.animation = 'spin 0.8s linear infinite';
+      btn.style.color = 'var(--accent-gold)';
+      btn.title = 'Syncing…';
+    } else if (status === 'synced') {
+      icon.style.animation = '';
+      btn.style.color = 'var(--accent-green)';
+      btn.title = 'Synced — click to force sync';
+      setTimeout(() => { if (btn) btn.style.color = ''; }, 2500);
+    } else if (status === 'error') {
+      icon.style.animation = '';
+      btn.style.color = 'var(--accent-red)';
+      btn.title = 'Sync error — click to retry';
+      setTimeout(() => { if (btn) btn.style.color = ''; }, 4000);
+    } else {
+      icon.style.animation = '';
+      btn.style.color = '';
+      btn.title = 'Sync to Google Sheets';
+    }
+  });
 }
 
 // ── Barcode Scanner ───────────────────────────────────────────────────────────
