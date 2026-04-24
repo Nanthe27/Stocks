@@ -135,9 +135,110 @@ img { max-width: 100%; }
 
 /* Mobile auth adjustments */
 @media (max-width: 480px) {
-  .auth-card { padding: 32px 24px; border-radius: var(--radius); }
-  .auth-logo { margin-bottom: 24px; }
-  .auth-logo-text { font-size: 1.25rem; }
+  #auth-screen {
+    align-items: stretch;
+    padding: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .auth-card {
+    min-height: 100dvh;
+    min-height: 100vh;
+    border-radius: 0;
+    border: none;
+    padding: 0;
+    background: #000;
+    box-shadow: none;
+    animation: none;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Top hero area */
+  .auth-logo {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+    margin-bottom: 0;
+    padding: calc(env(safe-area-inset-top) + 56px) 32px 40px;
+    background: linear-gradient(180deg, #0d0c08 0%, #000 100%);
+    border-bottom: 1px solid rgba(200,145,42,0.15);
+  }
+
+  .auth-logo .app-logo-img svg,
+  .auth-logo .app-logo-img img {
+    width: 72px !important;
+    height: 72px !important;
+    border-radius: 18px !important;
+    box-shadow: 0 0 0 1px rgba(200,145,42,0.3), 0 12px 40px rgba(0,0,0,0.8);
+  }
+
+  .auth-logo-text {
+    font-size: 2rem;
+    letter-spacing: -0.02em;
+  }
+
+  .auth-logo-text span {
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    color: var(--accent-gold);
+    opacity: 0.8;
+  }
+
+  /* Form area */
+  .auth-title {
+    font-size: 1rem;
+    margin-bottom: 20px;
+    text-align: center;
+    padding-top: 4px;
+  }
+
+  .auth-card > * {
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+
+  .auth-card form {
+    padding: 32px 28px calc(env(safe-area-inset-bottom) + 32px);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .auth-card .auth-error { border-radius: var(--radius-sm); }
+
+  .auth-card .form-input {
+    padding: 16px 18px;
+    font-size: 1rem;
+    border-radius: var(--radius);
+    background: #111;
+    border-color: #222;
+  }
+
+  .auth-card .form-input:focus {
+    border-color: rgba(200,145,42,0.6);
+    box-shadow: 0 0 0 3px rgba(200,145,42,0.1);
+  }
+
+  .auth-card .form-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+  }
+
+  .auth-card .btn-lg {
+    padding: 18px;
+    font-size: 1rem;
+    border-radius: var(--radius);
+    margin-top: 8px;
+  }
+
+  .auth-card p:last-child {
+    padding: 0 28px calc(env(safe-area-inset-bottom) + 16px);
+    text-align: center;
+  }
 }
 .auth-logo {
   display: flex; align-items: center; gap: 14px; margin-bottom: 36px;
