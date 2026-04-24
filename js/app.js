@@ -1,6 +1,6 @@
 // StockFlow — Main App v1.0.1
-import { t } from './locale.js?v=2';
-import Store, { DEFAULT_ROLES_PERMISSIONS } from './store.js?v=2';
+import { t } from './locale.js?v=3';
+import Store, { DEFAULT_ROLES_PERMISSIONS } from './store.js?v=3';
 
 // ── SVG Icons (Phosphor-style inline) ───────────────────────────────────────
 const icons = {
@@ -416,6 +416,8 @@ Pages.stock = {
     this.editingId = null;
     document.getElementById('stock-modal-title').textContent = t('addItem');
     document.getElementById('stock-form').reset();
+    // Auto-fill today's date
+    document.getElementById('stock-date').value = new Date().toISOString().split('T')[0];
     openModal('stock-modal');
   },
 
@@ -426,18 +428,22 @@ Pages.stock = {
     document.getElementById('stock-modal-title').textContent = t('editItem');
     const f = document.getElementById('stock-form');
     f['stock-name'].value = item.name;
-    f['stock-sku'].value = item.sku;
+    f['stock-sku'].value = item.sku || '';
     f['stock-category'].value = item.category;
     f['stock-quantity'].value = item.quantity;
     f['stock-cost'].value = item.costPrice;
     f['stock-sale'].value = item.salePrice;
     f['stock-supplier'].value = item.supplier;
     f['stock-desc'].value = item.description || '';
+    // Show existing date or today
+    const existing = item.createdAt ? item.createdAt.split('T')[0] : new Date().toISOString().split('T')[0];
+    document.getElementById('stock-date').value = existing;
     openModal('stock-modal');
   },
 
   saveItem() {
     const f = document.getElementById('stock-form');
+    const dateVal = f['stock-date'].value;
     const item = {
       name: f['stock-name'].value.trim(),
       sku: f['stock-sku'].value.trim(),
@@ -447,8 +453,9 @@ Pages.stock = {
       salePrice: parseFloat(f['stock-sale'].value) || 0,
       supplier: f['stock-supplier'].value.trim(),
       description: f['stock-desc'].value.trim(),
+      createdAt: dateVal ? new Date(dateVal).toISOString() : new Date().toISOString(),
     };
-    if (!item.name || !item.sku) { toast('Name and SKU are required.', 'error'); return; }
+    if (!item.name) { toast('Item name is required.', 'error'); return; }
     if (this.editingId) {
       Store.updateStockItem(this.editingId, item);
       toast(t('success') + ': Item updated.', 'success');
