@@ -1,7 +1,7 @@
 // StockFlow Data Store — v1.0.0
 // In-memory primary store with background Google Sheets sync
 
-import { t } from './locale.js';
+import { t } from './locale.js?v=2';
 
 // ── Default seed data ────────────────────────────────────────────────────────
 const DEFAULT_USERS = [
