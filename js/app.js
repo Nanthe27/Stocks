@@ -1,6 +1,6 @@
 // StockFlow — Main App v1.0.0
-import { t } from './locale.js';
-import Store, { DEFAULT_ROLES_PERMISSIONS } from './store.js';
+import { t } from './locale.js?v=2';
+import Store, { DEFAULT_ROLES_PERMISSIONS } from './store.js?v=2';
 
 // ── SVG Icons (Phosphor-style inline) ───────────────────────────────────────
 const icons = {
