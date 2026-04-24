@@ -1,6 +1,6 @@
 // StockFlow — Main App v1.0.1
-import { t } from './locale.js?v=7';
-import Store, { DEFAULT_ROLES_PERMISSIONS } from './store.js?v=7';
+import { t } from './locale.js?v=8';
+import Store, { DEFAULT_ROLES_PERMISSIONS } from './store.js?v=8';
 
 // ── SVG Icons (Phosphor-style inline) ───────────────────────────────────────
 const icons = {
@@ -1001,12 +1001,19 @@ const Calc = {
       el.innerHTML = `<div style="font-size:.78rem;color:var(--text-muted);text-align:center;padding:12px 0">No history yet</div>`;
       return;
     }
-    el.innerHTML = this.history.map(h => `
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border-radius:var(--radius-sm);background:var(--bg-elevated);cursor:pointer;font-size:.8rem"
-           onclick="Calc.recallHistory('${h.entry.split(' = ')[1]}')">
+    el.innerHTML = this.history.map((h, i) => {
+      const result = h.entry.split(' = ')[1] || '';
+      return `<div class="calc-hist-item" data-idx="${i}" data-val="${result.replace(/"/g,'&quot;')}"
+        style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border-radius:var(--radius-sm);background:var(--bg-elevated);cursor:pointer;font-size:.8rem">
         <span style="color:var(--text-secondary)">${h.entry}</span>
         <span style="color:var(--text-muted);font-size:.7rem;flex-shrink:0;margin-left:8px">${h.time}</span>
-      </div>`).join('');
+      </div>`;
+    }).join('');
+    // Delegated click — no inline handlers
+    el.onclick = (e) => {
+      const item = e.target.closest('.calc-hist-item');
+      if (item) this.recallHistory(item.dataset.val);
+    };
   },
 
   recallHistory(val) {
@@ -1160,18 +1167,7 @@ const Barcode = {
       const item = Store.getStock().find(s => s.barcode === code);
       if (item) {
         toast('Found: ' + item.name, 'success');
-        // Show action sheet
-        setTimeout(() => {
-          confirm(`${item.name}\nWhat do you want to do?`, () => Pages.stock.openSell(item.id));
-          document.getElementById('confirm-yes').textContent = 'Record Sale';
-          // Add restock option
-          const no = document.getElementById('confirm-no');
-          no.textContent = 'Restock';
-          no.onclick = () => {
-            closeModal('confirm-overlay');
-            Pages.stock.openEdit(item.id);
-          };
-        }, 300);
+        setTimeout(() => Pages.stock.openSell(item.id), 400);
       } else {
         toast('No item found for barcode: ' + code, 'warning');
       }
