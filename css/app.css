@@ -6,20 +6,20 @@
 /* ── CSS Variables ──────────────────────────────────────────────────────────── */
 :root {
   /* Dark theme — cinematic */
-  --bg-primary:    #080808;
-  --bg-secondary:  #0d0d0d;
-  --bg-card:       #111111;
-  --bg-elevated:   #181818;
-  --bg-hover:      #1e1e1e;
-  --bg-input:      #141414;
+  --bg-primary:    #000000;
+  --bg-secondary:  #000000;
+  --bg-card:       #0a0a0a;
+  --bg-elevated:   #0f0f0f;
+  --bg-hover:      #141414;
+  --bg-input:      #0a0a0a;
 
-  --border:        #242424;
-  --border-subtle: #181818;
+  --border:        #1e1e1e;
+  --border-subtle: #141414;
 
-  --text-primary:   #eeeeee;
-  --text-secondary: #787878;
-  --text-muted:     #404040;
-  --text-inverse:   #080808;
+  --text-primary:   #ffffff;
+  --text-secondary: #999999;
+  --text-muted:     #444444;
+  --text-inverse:   #000000;
 
   --accent-red:    #e04040;
   --accent-blue:   #2d7dd2;
