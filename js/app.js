@@ -1,6 +1,6 @@
 // StockFlow — Main App v1.0.1
-import { t } from './locale.js?v=8';
-import Store, { DEFAULT_ROLES_PERMISSIONS } from './store.js?v=8';
+import { t } from './locale.js?v=9';
+import Store, { DEFAULT_ROLES_PERMISSIONS } from './store.js?v=9';
 
 // ── SVG Icons (Phosphor-style inline) ───────────────────────────────────────
 const icons = {
@@ -221,7 +221,11 @@ Pages.dashboard = {
   },
 
   renderCharts(data) {
-    if (typeof Chart === 'undefined') return; // Chart.js not loaded yet
+    if (typeof Chart === 'undefined') return;
+    const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+    const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+    const labelColor = isDark ? '#666' : '#999';
+
     // Bar chart — last 6 months income vs expense
     const months = [];
     const incomeData = [];
@@ -238,9 +242,6 @@ Pages.dashboard = {
     const barCtx = document.getElementById('chart-bar');
     if (barCtx) {
       if (this.charts.bar) this.charts.bar.destroy();
-      const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
-      const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
-      const labelColor = isDark ? '#666' : '#999';
       this.charts.bar = new Chart(barCtx, {
         type: 'bar',
         data: {
@@ -1251,6 +1252,15 @@ window.openModal = openModal;
 window.openDisclaimer = openDisclaimer;
 
 document.addEventListener('DOMContentLoaded', init);
+
+// ── Global error catcher — surfaces hidden JS errors ─────────────────────────
+window.addEventListener('error', e => {
+  console.error('JS Error:', e.message, e.filename, e.lineno);
+  toast('JS Error: ' + e.message, 'error');
+});
+window.addEventListener('unhandledrejection', e => {
+  console.error('Unhandled promise:', e.reason);
+});
 
 // ── Ripple effect on all .btn clicks ─────────────────────────────────────────
 document.addEventListener('click', e => {
