@@ -1,6 +1,6 @@
 // StockFlow — Main App v1.0.1
-import { t } from './locale.js?v=3';
-import Store, { DEFAULT_ROLES_PERMISSIONS } from './store.js?v=3';
+import { t } from './locale.js?v=6';
+import Store, { DEFAULT_ROLES_PERMISSIONS } from './store.js?v=6';
 
 // ── SVG Icons (Phosphor-style inline) ───────────────────────────────────────
 const icons = {
@@ -561,7 +561,7 @@ Pages.users = {
   },
 
   roleBadge(r) {
-    return { owner: 'role-owner', admin: 'role-admin', sale: 'role-sale', customer: 'role-customer' }[r] || 'badge-neutral';
+    return { owner: 'role-owner', admin: 'role-admin', sale: 'role-sale', staff: 'badge-blue', customer: 'role-customer' }[r] || 'badge-neutral';
   },
 
   openAdd() {
@@ -913,19 +913,62 @@ const Calc = {
   display: '0',
   expression: '',
   justCalc: false,
+  history: JSON.parse(localStorage.getItem('calc_history') || '[]'),
 
-  open() { document.getElementById('calc-overlay').classList.add('open'); this.updateDisplay(); },
+  open() {
+    document.getElementById('calc-overlay').classList.add('open');
+    this.updateDisplay();
+    this.renderHistory();
+    this._bindKeyboard();
+  },
+
   close() {
     const ov = document.getElementById('calc-overlay');
     ov.classList.add('closing');
     setTimeout(() => ov.classList.remove('open', 'closing'), 240);
+    this._unbindKeyboard();
+  },
+
+  _keyHandler: null,
+  _bindKeyboard() {
+    this._unbindKeyboard();
+    this._keyHandler = (e) => {
+      if (!document.getElementById('calc-overlay').classList.contains('open')) return;
+      // Don't intercept if user is typing in an input
+      if (e.target.tagName === 'INPUT') return;
+      const map = {
+        '0':'0','1':'1','2':'2','3':'3','4':'4','5':'5','6':'6','7':'7','8':'8','9':'9',
+        '.':'.', '+':'+', '-':'-', '*':'*', '/':'/',
+        'Enter':'=', '=':'=', 'Backspace':'DEL', 'Escape':'C', '%':'%',
+      };
+      const k = map[e.key];
+      if (k) { e.preventDefault(); this.press(k); }
+    };
+    document.addEventListener('keydown', this._keyHandler);
+  },
+  _unbindKeyboard() {
+    if (this._keyHandler) { document.removeEventListener('keydown', this._keyHandler); this._keyHandler = null; }
   },
 
   press(val) {
+    const prevExpr = this.expression;
     if (val === 'C') { this.display = '0'; this.expression = ''; this.justCalc = false; }
+    else if (val === 'DEL') {
+      if (this.expression.length > 1) { this.expression = this.expression.slice(0, -1); this.display = this.expression; }
+      else { this.expression = ''; this.display = '0'; }
+      this.justCalc = false;
+    }
     else if (val === '=') {
-      try { const r = Function('"use strict";return (' + this.expression + ')')(); this.display = String(parseFloat(r.toFixed(8))); this.expression = this.display; this.justCalc = true; }
-      catch { this.display = 'Error'; this.expression = ''; }
+      try {
+        const r = Function('"use strict";return (' + this.expression + ')')();
+        const result = String(parseFloat(r.toFixed(8)));
+        if (this.expression && this.expression !== result) {
+          this._addHistory(this.expression + ' = ' + result);
+        }
+        this.display = result;
+        this.expression = result;
+        this.justCalc = true;
+      } catch { this.display = 'Error'; this.expression = ''; }
     } else if (val === '+/-') {
       this.display = String(-parseFloat(this.display));
       this.expression = this.display;
@@ -934,12 +977,50 @@ const Calc = {
       this.expression = this.display;
     } else {
       if (this.justCalc && !isNaN(val)) { this.expression = val; this.display = val; this.justCalc = false; }
-      else { if (this.display === '0' && !isNaN(val)) { this.expression = val; this.display = val; }
+      else {
+        if (this.display === '0' && !isNaN(val)) { this.expression = val; this.display = val; }
         else { this.expression += val; this.display = this.expression.length > 14 ? this.expression.slice(-14) : this.expression; }
       }
+      this.justCalc = false;
     }
     this.updateDisplay();
     this.syncConverter();
+  },
+
+  _addHistory(entry) {
+    this.history.unshift({ entry, time: new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }) });
+    if (this.history.length > 30) this.history.pop();
+    localStorage.setItem('calc_history', JSON.stringify(this.history));
+    this.renderHistory();
+  },
+
+  renderHistory() {
+    const el = document.getElementById('calc-history');
+    if (!el) return;
+    if (!this.history.length) {
+      el.innerHTML = `<div style="font-size:.78rem;color:var(--text-muted);text-align:center;padding:12px 0">No history yet</div>`;
+      return;
+    }
+    el.innerHTML = this.history.map(h => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border-radius:var(--radius-sm);background:var(--bg-elevated);cursor:pointer;font-size:.8rem"
+           onclick="Calc.recallHistory('${h.entry.split(' = ')[1]}')">
+        <span style="color:var(--text-secondary)">${h.entry}</span>
+        <span style="color:var(--text-muted);font-size:.7rem;flex-shrink:0;margin-left:8px">${h.time}</span>
+      </div>`).join('');
+  },
+
+  recallHistory(val) {
+    this.display = val;
+    this.expression = val;
+    this.justCalc = true;
+    this.updateDisplay();
+    this.syncConverter();
+  },
+
+  clearHistory() {
+    this.history = [];
+    localStorage.removeItem('calc_history');
+    this.renderHistory();
   },
 
   updateDisplay() {
