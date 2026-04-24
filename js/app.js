@@ -117,6 +117,7 @@ const Router = {
     const navEl = document.querySelector(`[data-page="${page}"]`);
     if (navEl) navEl.classList.add('active');
     document.getElementById('topbar-title').textContent = t(page);
+    if (typeof MobileNav !== 'undefined') MobileNav.syncFromRouter(page);
     Pages[page] && Pages[page].render && Pages[page].render();
   }
 };
@@ -434,7 +435,7 @@ Pages.stock = {
     f['stock-cost'].value = item.costPrice;
     f['stock-sale'].value = item.salePrice;
     f['stock-supplier'].value = item.supplier;
-    f['stock-desc'].value = item.description || '';
+    f['stock-barcode'].value = item.barcode || '';
     // Show existing date or today
     const existing = item.createdAt ? item.createdAt.split('T')[0] : new Date().toISOString().split('T')[0];
     document.getElementById('stock-date').value = existing;
@@ -452,7 +453,7 @@ Pages.stock = {
       costPrice: parseFloat(f['stock-cost'].value) || 0,
       salePrice: parseFloat(f['stock-sale'].value) || 0,
       supplier: f['stock-supplier'].value.trim(),
-      description: f['stock-desc'].value.trim(),
+      barcode: f['stock-barcode'].value.trim(),
       createdAt: dateVal ? new Date(dateVal).toISOString() : new Date().toISOString(),
     };
     if (!item.name) { toast('Item name is required.', 'error'); return; }
@@ -1031,10 +1032,121 @@ function initStoreListeners() {
   Store.on('storeChanged', () => { Router.navigate(Router.current); });
 }
 
+// ── Barcode Scanner ───────────────────────────────────────────────────────────
+const Barcode = {
+  _stream: null,
+  _raf: null,
+  _targetField: null,
+  _onFound: null,
+
+  scanIntoField(fieldId) {
+    this._targetField = fieldId;
+    this._onFound = (code) => {
+      const el = document.getElementById(fieldId);
+      if (el) { el.value = code; el.dispatchEvent(new Event('input')); }
+      toast('Barcode scanned: ' + code, 'success');
+    };
+    this._open();
+  },
+
+  scanToFind() {
+    this._targetField = null;
+    this._onFound = (code) => {
+      const item = Store.getStock().find(s => s.barcode === code);
+      if (item) {
+        toast('Found: ' + item.name, 'success');
+        // Show action sheet
+        setTimeout(() => {
+          confirm(`${item.name}\nWhat do you want to do?`, () => Pages.stock.openSell(item.id));
+          document.getElementById('confirm-yes').textContent = 'Record Sale';
+          // Add restock option
+          const no = document.getElementById('confirm-no');
+          no.textContent = 'Restock';
+          no.onclick = () => {
+            closeModal('confirm-overlay');
+            Pages.stock.openEdit(item.id);
+          };
+        }, 300);
+      } else {
+        toast('No item found for barcode: ' + code, 'warning');
+      }
+    };
+    this._open();
+  },
+
+  async _open() {
+    openModal('scan-modal');
+    document.getElementById('scan-manual').value = '';
+    try {
+      this._stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+      });
+      const video = document.getElementById('scan-video');
+      video.srcObject = this._stream;
+      video.play();
+      video.addEventListener('loadedmetadata', () => this._tick(), { once: true });
+    } catch {
+      toast('Camera not available. Type barcode manually.', 'warning');
+    }
+  },
+
+  _tick() {
+    const video = document.getElementById('scan-video');
+    const canvas = document.getElementById('scan-canvas');
+    if (!video || !canvas || !document.getElementById('scan-modal').classList.contains('open')) {
+      this.stopScan(); return;
+    }
+    const ctx = canvas.getContext('2d');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    ctx.drawImage(video, 0, 0);
+    try {
+      const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const result = typeof jsQR !== 'undefined' && jsQR(img.data, img.width, img.height, { inversionAttempts: 'dontInvert' });
+      if (result && result.data) {
+        this.stopScan();
+        this._onFound && this._onFound(result.data);
+        return;
+      }
+    } catch {}
+    this._raf = requestAnimationFrame(() => this._tick());
+  },
+
+  confirmManual() {
+    const val = document.getElementById('scan-manual').value.trim();
+    if (!val) return;
+    this.stopScan();
+    this._onFound && this._onFound(val);
+  },
+
+  stopScan() {
+    cancelAnimationFrame(this._raf);
+    if (this._stream) { this._stream.getTracks().forEach(t => t.stop()); this._stream = null; }
+    closeModal('scan-modal');
+  },
+};
+
+// ── Mobile Nav helper ─────────────────────────────────────────────────────────
+const MobileNav = {
+  setActive(btn) {
+    document.querySelectorAll('.mob-nav-item').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  },
+  syncFromRouter(page) {
+    document.querySelectorAll('.mob-nav-item[data-page]').forEach(b => {
+      b.classList.toggle('active', b.dataset.page === page);
+    });
+  },
+};
+
 // Expose globally for inline handlers
 window.Pages = Pages;
 window.Calc = Calc;
+window.Router = Router;
+window.Barcode = Barcode;
+window.MobileNav = MobileNav;
 window.closeModal = closeModal;
+window.openModal = openModal;
 window.openDisclaimer = openDisclaimer;
 
 document.addEventListener('DOMContentLoaded', init);
